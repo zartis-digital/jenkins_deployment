@@ -11,7 +11,7 @@ resource "aws_instance" "jenkins" {
   ami           = "ami-0bbe28eb2173f6167"
   instance_type = "t2.micro"
   key_name      = "jenkins_access"
-  security_groups = ["jenkins_security",]
+  security_groups = ["jenkins security",]
 
   tags = {
     Name = "jenkins-instance"

@@ -1,0 +1,48 @@
+- name: Install Jenkins Server
+  gather_facts: false
+  hosts: jenkins
+  become: yes
+  tasks:
+
+    - name: Hostname
+      command: hostname
+      register: hname
+
+    - debug: msg="{{ hname.stdout }}"
+
+    - name: Update apt
+      command: apt update
+
+    - name: Install Java
+      command: apt install -y openjdk-8-jdk
+
+    - name: Install key for the Jenkins apt repository
+      apt_key:
+        url: https://pkg.jenkins.io/debian/jenkins.io.key
+        state: present
+
+    - name: Add access to the Jenkins apt repository
+      apt_repository:
+        repo: deb http://pkg.jenkins.io/debian-stable binary/
+        state: present
+        filename: 'jenkins-stable'
+
+    - name: Update apt for Jenkins repository
+      command: apt update
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: installed
+
+    - name: Time for Jenkins to run
+      wait_for: timeout=35
+
+    - name: Get Jenkins password
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      changed_when: false
+      register: result
+
+    - name: Password to "Unlock Jenkins"
+      debug:
+        var: result.stdout
